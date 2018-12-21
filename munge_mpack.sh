@@ -17,34 +17,38 @@ fi
 case $MPACK_NAME in
   HDPCORE)
     SRC_DIR=~/src/hwx/pdr/hdpcore-pdr
-    PROJECT_DIRS=(~/src/hwx/pdr/zookeeper-pdr ~/src/hwx/pdr/hadoop-pdr)
+    MODULE_DIRS[0]=~/src/hwx/pdr/hadoop-pdr/ambari-definitions/hadoop_clients
+    MODULE_DIRS[1]=~/src/hwx/pdr/hadoop-pdr/ambari-definitions/hdfs
+    MODULE_DIRS[2]=~/src/hwx/pdr/hadoop-pdr/ambari-definitions/mapreduce2
+    MODULE_DIRS[3]=~/src/hwx/pdr/hadoop-pdr/ambari-definitions/yarn
+    MODULE_DIRS[4]=~/src/hwx/pdr/zookeeper-pdr/ambari-definitions/zookeeper
+    MODULE_DIRS[5]=~/src/hwx/pdr/zookeeper-pdr/ambari-definitions/zookeeper_clients
     ;;
   ODS)
     SRC_DIR=~/src/hwx/pdr/ods-pdr
-    PROJECT_DIRS=(~/src/hwx/pdr/hbase-pdr)
+    MODULE_DIRS[4]=~/src/hwx/pdr/hbase-pdr/ambari-definitions/hbase
+    MODULE_DIRS[5]=~/src/hwx/pdr/hbase-pdr/ambari-definitions/hbase_clients
     ;;
   *)
     ;;
 esac
 
-MPACK_BASE=~/src/hwx/ambari/ambari-server/src/main/resources/stacks/$MPACK_NAME/$MPACK_VERSION
-
-# first munge the mpack
-#mpack_file=$MPACK_BASE/mpack.json
-#mpack_original=$mpack_file.original
-
-#if [ ! -f $mpack_original ]; then
-#  cp $mpack_file $mpack_original
-#fi
+STACK_BASE=~/src/hwx/ambari/ambari-server/src/main/resources/stacks/$MPACK_NAME/$MPACK_VERSION
 
 SRC_UPGRADE=$SRC_DIR/ambari-definitions/src/main/resources/mpack-definition/upgrades/upgrade.xml
 
-
 # then munge the upgrade.xml file
-if [ -f $MPACK_BASE/upgrades/upgrade.xml ]; then
-  echo "Removing $MPACK_BASE/upgrades/upgrade.xml"
-  rm $MPACK_BASE/upgrades/upgrade.xml
-  echo "Linking $MPACK_BASE/upgrades/upgrade.xml"
-  ln $SRC_UPGRADE $MPACK_BASE/upgrades/upgrade.xml
+if [ -f $STACK_BASE/upgrades/upgrade.xml ]; then
+  echo "Removing $STACK_BASE/upgrades/upgrade.xml"
+  rm $STACK_BASE/upgrades/upgrade.xml
+
+  echo "Linking $STACK_BASE/upgrades/upgrade.xml"
+  ln -s $SRC_UPGRADE $STACK_BASE/upgrades/upgrade.xml
+
+  for x in ${MODULE_DIRS[@]}; do
+    echo "${x}"
+  done
+
+
 fi
 
